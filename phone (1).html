@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>双模手机 · 微信+淘宝完整版 | 灵感微博镶嵌</title>
+    <!-- Font Awesome 6 图标库 (用于音乐播放器) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, #1a2a3a, #0b1017);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: system-ui, -apple-system, 'Segoe UI', 'SF Pro Text', Helvetica, sans-serif;
+            padding: 20px;
+        }
+
+        .phone {
+            width: 100%;
+            max-width: 360px;
+            height: 640px;
+            background-color: #f7f9fe;
+            border-radius: 48px;
+            box-shadow: 0 35px 45px -18px rgba(0, 0, 0, 0.6), 0 0 0 6px #3e4149, 0 0 0 12px #181c22;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+
+        .phone:active {
+            transform: scale(0.99);
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 13px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 108px;
+            height: 34px;
+            background: #0f0f12;
+            border-radius: 28px;
+            z-index: 25;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(2px);
+            box-shadow: inset 0 0.5px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .dynamic-island .sensor {
+            width: 8px;
+            height: 8px;
+            background: #2a2b30;
+            border-radius: 50%;
+        }
+        .dynamic-island .camera {
+            width: 26px;
+            height: 24px;
+            background: #141519;
+            border-radius: 20px;
+            position: relative;
+        }
+        .dynamic-island .camera::after {
+            content: "●";
+            font-size: 8px;
+            color: #1f8b4c;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            opacity: 0.9;
+        }
+
+        .app-screen {
+            height: 100%;
+            width: 100%;
+            padding: 58px 18px 20px 18px;
+            background: linear-gradient(145deg, #fbfdff 0%, #f0f4fa 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 微信/淘宝/钱包/音乐/微博 嵌入层共用 */
+        .embed-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ededed;
+            z-index: 100;
+            border-radius: 48px;
+            overflow: hidden;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .embed-layer.active {
+            transform: translateY(0);
+        }
+        .close-app-btn {
+            position: absolute;
+            top: 18px;
+            right: 20px;
+            width: 32px;
+            height: 32px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 200;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .close-app-btn:hover {
+            background: rgba(0,0,0,0.7);
+            transform: scale(1.05);
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 6px 10px 6px;
+            font-size: 15px;
+            font-weight: 590;
+            color: #1c2a3a;
+        }
+        .status-bar .time {
+            font-weight: 600;
+        }
+
+        .greeting {
+            margin: 8px 0 12px 0;
+            padding-left: 4px;
+        }
+        .greeting h2 {
+            font-size: 28px;
+            font-weight: 640;
+            background: linear-gradient(130deg, #1f2e3c, #2c3e50);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .greeting p {
+            font-size: 13px;
+            color: #6c7e97;
+            margin-top: 6px;
+        }
+
+        .grid-five {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px 20px;
+            margin-top: 24px;
+            margin-bottom: 20px;
+        }
+
+        .func-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 18px 8px 14px 8px;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.04);
+            border: 0.5px solid rgba(255, 255, 255, 0.7);
+        }
+
+        .func-card:active {
+            transform: scale(0.94);
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        .icon-bg {
+            width: 64px;
+            height: 64px;
+            border-radius: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 14px rgba(0, 0, 0, 0.12);
+        }
+        .icon-bg span {
+            font-size: 34px;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+        }
+        .app-name {
+            font-size: 13px;
+            font-weight: 580;
+            color: #1f2a44;
+            background: rgba(255,255,240,0.5);
+            padding: 4px 8px;
+            border-radius: 30px;
+        }
+        .func-card[data-app="wechat"] .icon-bg { background: linear-gradient(135deg, #30dc6c, #17a34a); }
+        .func-card[data-app="taobao"] .icon-bg { background: linear-gradient(140deg, #ff5e62, #f53844); }
+        .func-card[data-app="weibo"] .icon-bg { background: linear-gradient(145deg, #ff9500, #f97316); }
+        .func-card[data-app="music"] .icon-bg { background: linear-gradient(125deg, #ff6ac4, #e83e8c); }
+        .func-card[data-app="wallet"] .icon-bg { background: linear-gradient(145deg, #3b82f6, #2563eb); }
+
+        .toast-msg {
+            position: absolute;
+            bottom: 36px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(20, 22, 32, 0.92);
+            backdrop-filter: blur(12px);
+            color: #f0f3fa;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 200;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+        }
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0px);
+        }
+        .home-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 130px;
+            height: 5px;
+            background: #d1d9e6;
+            border-radius: 40px;
+            z-index: 20;
+            opacity: 0.8;
+        }
+
+        /* ========= 微信完整样式（无删减） ========= */
+        .censy-wechat-app-v1 {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #ededed;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
+        .cw-header {
+            height: 50px;
+            background: #ededed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+            color: #000;
+            position: relative;
+            border-bottom: 1px solid #dcdcdc;
+            z-index: 10;
+        }
+        .cw-back {
+            position: absolute;
+            left: 15px;
+            cursor: pointer;
+            display: none;
+            font-size: 24px;
+            font-weight: normal;
+        }
+        .cw-view-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        .cw-view {
+            position: absolute;
+            inset: 0;
+            overflow-y: auto;
+            background: #ededed;
+            display: none;
+        }
+        .cw-view.active {
+            display: block;
+        }
+        .cw-tabbar {
+            height: 55px;
+            background: #f7f7f7;
+            border-top: 1px solid #dcdcdc;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-size: 10px;
+            color: #191919;
+        }
+        .cw-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            opacity: 0.6;
+        }
+        .cw-tab.active {
+            opacity: 1;
+            color: #07c160;
+        }
+        .cw-chat-item {
+            display: flex;
+            padding: 12px 15px;
+            background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+        }
+        .cw-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 6px;
+            background: #ccc;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+        }
+        .cw-chat-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .cw-chat-name {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        .cw-chat-msg {
+            font-size: 13px;
+            color: #999;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 250px;
+        }
+        .cw-chat-room {
+            background: #ededed;
+            padding: 15px;
+            padding-bottom: 70px;
+        }
+        .cw-msg-row {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .cw-msg-row.me {
+            flex-direction: row-reverse;
+        }
+        .cw-msg-row.me .cw-avatar {
+            margin-right: 0;
+            margin-left: 12px;
+            background: #07c160;
+        }
+        .cw-bubble {
+            max-width: 65%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.4;
+            word-break: break-all;
+        }
+        .cw-msg-row.other .cw-bubble {
+            background: #fff;
+            color: #333;
+        }
+        .cw-msg-row.me .cw-bubble {
+            background: #95ec69;
+            color: #000;
+        }
+        .cw-transfer {
+            background: #fa9d3b !important;
+            color: #fff !important;
+            padding: 12px 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            min-width: 180px;
+        }
+        .cw-transfer-icon {
+            width: 30px;
+            height: 30px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+        .cw-transfer-info {
+            flex: 1;
+        }
+        .cw-transfer-amount {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .cw-transfer-status {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        .cw-pic-msg {
+            background: #e0e0e0 !important;
+            padding: 0 !important;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 12px;
+            border: 1px solid #dcdcdc;
+        }
+        .cw-location-msg {
+            background: #fff !important;
+            padding: 0 !important;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 200px;
+        }
+        .cw-loc-title {
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            border-bottom: 1px solid #eee;
+        }
+        .cw-loc-map {
+            height: 80px;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 12px;
+        }
+        .cw-input-area {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #f7f7f7;
+            border-top: 1px solid #dcdcdc;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        .cw-input {
+            flex: 1;
+            height: 36px;
+            background: #fff;
+            border-radius: 4px;
+            border: none;
+            padding: 0 10px;
+            outline: none;
+            font-size: 15px;
+        }
+        .cw-send-btn {
+            width: 60px;
+            height: 36px;
+            background: #07c160;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            margin-left: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .cw-moments {
+            background: #fff;
+            min-height: 100%;
+        }
+        .cw-moments-cover {
+            height: 200px;
+            background: linear-gradient(145deg, #4a6a8a, #2c3e50);
+            position: relative;
+        }
+        .cw-moments-avatar {
+            position: absolute;
+            right: 15px;
+            bottom: -20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: #07c160;
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+        }
+        .cw-moments-name {
+            position: absolute;
+            right: 90px;
+            bottom: 10px;
+            color: #fff;
+            font-weight: bold;
+            font-size: 18px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .cw-moment-item {
+            padding: 20px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+        }
+        .cw-moment-left .cw-avatar {
+            width: 40px;
+            height: 40px;
+        }
+        .cw-moment-right {
+            flex: 1;
+        }
+        .cw-moment-user {
+            color: #576b95;
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+        .cw-moment-content {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .cw-moment-pic {
+            width: 120px;
+            height: 120px;
+            background: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+        .cw-moment-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #999;
+            font-size: 12px;
+        }
+        .cw-action-btn {
+            color: #576b95;
+            background: #f7f7f7;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .cw-comments-box {
+            background: #f7f7f7;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        .cw-like-row {
+            color: #576b95;
+            font-weight: bold;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .cw-heart {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            background: #576b95;
+            clip-path: polygon(50% 100%, 0 40%, 0 0, 50% 20%, 100% 0, 100% 40%);
+            margin-right: 6px;
+            transition: background 0.2s;
+        }
+        .cw-heart.liked {
+            background: #ff5050;
+        }
+        .cw-comment-row span {
+            color: #576b95;
+            font-weight: bold;
+        }
+        .cw-watermark {
+            position: absolute;
+            bottom: 60px;
+            width: 100%;
+            text-align: center;
+            font-size: 10px;
+            color: rgba(0,0,0,0.1);
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        /* ========= 淘宝完整样式（用户原版） ========= */
+        .censy-tb-app {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 600px;
+            margin: 0 auto;
+            background: #f2f2f2;
+            border-radius: 12px;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            user-select: none;
+        }
+        .ctb-header {
+            height: 44px;
+            background: #ff5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            position: relative;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        .ctb-back {
+            position: absolute;
+            left: 15px;
+            cursor: pointer;
+            display: none;
+            font-size: 18px;
+        }
+        .ctb-view-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        .ctb-view {
+            position: absolute;
+            inset: 0;
+            overflow-y: auto;
+            background: #f2f2f2;
+            display: none;
+            padding-bottom: 60px;
+        }
+        .ctb-view.active {
+            display: block;
+        }
+        .ctb-search-bar {
+            background: #ff5000;
+            padding: 10px 15px;
+        }
+        .ctb-search-inner {
+            background: #fff;
+            height: 32px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            color: #999;
+            font-size: 13px;
+        }
+        .ctb-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 10px;
+        }
+        .ctb-item-card {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            padding-bottom: 10px;
+        }
+        .ctb-item-pic {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .pic-perfume { background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); }
+        .pic-perfume::after { content: ''; width: 40px; height: 60px; background: rgba(255,182,193,0.5); border: 2px solid #ffb6c1; border-radius: 4px; }
+        .pic-coffee { background: linear-gradient(to bottom, #d4b895, #8b5a2b); }
+        .pic-coffee::after { content: '?'; font-size: 40px; }
+        .pic-lipstick { background: #ffe4e1; }
+        .pic-lipstick::after { content: ''; width: 20px; height: 50px; background: linear-gradient(to bottom, #dc143c 40%, #000 40%); border-radius: 2px 2px 0 0; }
+        .pic-phone { background: #e0e0e0; }
+        .pic-phone::after { content: ''; width: 45px; height: 80px; background: #333; border-radius: 6px; border: 2px solid #999; }
+        .pic-bag { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); }
+        .pic-bag::after { content: '??'; font-size: 40px; }
+        .pic-shoes { background: #fffaf0; }
+        .pic-shoes::after { content: '??'; font-size: 40px; }
+        .ctb-item-info {
+            padding: 8px;
+        }
+        .ctb-item-title {
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .ctb-item-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ctb-item-price {
+            color: #ff5000;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .ctb-item-price::before {
+            content: '￥';
+            font-size: 12px;
+            margin-right: 2px;
+        }
+        .ctb-add-btn {
+            width: 24px;
+            height: 24px;
+            background: #ff5000;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .ctb-list-wrap {
+            padding: 10px;
+        }
+        .ctb-list-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+        .ctb-list-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .ctb-list-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 80px;
+        }
+        .ctb-list-title {
+            font-size: 14px;
+            color: #333;
+        }
+        .ctb-list-price {
+            color: #ff5000;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .ctb-empty {
+            text-align: center;
+            color: #999;
+            padding-top: 100px;
+            font-size: 14px;
+        }
+        .ctb-cart-footer {
+            position: absolute;
+            bottom: 50px;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: #fff;
+            border-top: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            box-sizing: border-box;
+            z-index: 5;
+        }
+        .ctb-total-box {
+            font-size: 14px;
+            color: #333;
+        }
+        .ctb-total-price {
+            color: #ff5000;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .ctb-checkout-btn {
+            background: linear-gradient(90deg, #ff9000, #ff5000);
+            color: #fff;
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .ctb-address-card {
+            background: #fff;
+            margin: 10px;
+            border-radius: 12px;
+            padding: 15px;
+            position: relative;
+            cursor: pointer;
+        }
+        .ctb-addr-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        .ctb-addr-tag {
+            background: #ff5000;
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 6px;
+        }
+        .ctb-addr-detail {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 8px;
+        }
+        .ctb-addr-user {
+            font-size: 13px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .ctb-pay-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 15px;
+            box-sizing: border-box;
+            border-top: 1px solid #eee;
+        }
+        .ctb-pay-btn {
+            background: #ff5000;
+            color: #fff;
+            width: 120px;
+            height: 40px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .ctb-tabbar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: #fff;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 10;
+        }
+        .ctb-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #999;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        .ctb-tab.active {
+            color: #ff5000;
+        }
+        .ctb-tab-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+        .ctb-modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .ctb-modal-overlay.active {
+            display: flex;
+        }
+        .ctb-modal-box {
+            background: #fff;
+            width: 280px;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+        .ctb-modal-overlay.active .ctb-modal-box {
+            transform: scale(1);
+            opacity: 1;
+        }
+        .ctb-modal-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .ctb-modal-btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .ctb-modal-btn {
+            flex: 1;
+            height: 36px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .ctb-btn-cancel { background: #f2f2f2; color: #333; }
+        .ctb-btn-confirm { background: #ff5000; color: #fff; }
+        .ctb-watermark {
+            position: absolute;
+            top: 50px;
+            right: 10px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            z-index: 11;
+            pointer-events: none;
+        }
+
+        /* ========= 钱包完整样式（CENSY WALLET v2.0 完整无删减） ========= */
+        .censy-wallet-full {
+            width: 100%; height: 100%; margin: 0 auto;
+            background: #f4f7f5; overflow: hidden;
+            font-family: 'Noto Sans SC', sans-serif; position: relative;
+        }
+        .censy-wallet-full .cw-header {
+            height: 54px; display: flex; align-items: center; justify-content: center;
+            background: #fff; position: relative;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+        }
+        .censy-wallet-full .cw-header-title {
+            color: #2d3a2e; font-size: 15px; font-weight: 700; letter-spacing: 3px;
+        }
+        .censy-wallet-full .cw-header-dot {
+            position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+            width: 7px; height: 7px; border-radius: 50%; background: #7ec8a0;
+            box-shadow: 0 0 8px rgba(126,200,160,0.5);
+        }
+        .censy-wallet-full .cw-tab-bar {
+            display: flex; height: 44px; background: #fff;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+        }
+        .censy-wallet-full .cw-tab-btn {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            color: #b0b8b2; font-size: 13px; font-weight: 500; cursor: pointer;
+            transition: all 0.3s ease; position: relative; letter-spacing: 1px;
+            border: none; background: none; font-family: inherit;
+        }
+        .censy-wallet-full .cw-tab-btn.active { color: #3a7d5c; }
+        .censy-wallet-full .cw-tab-btn.active::after {
+            content: ''; position: absolute; bottom: 0; left: 30%; width: 40%; height: 2.5px;
+            background: #7ec8a0; border-radius: 2px;
+        }
+        .censy-wallet-full .cw-content { height: calc(100% - 98px); overflow: hidden; position: relative; }
+        .censy-wallet-full .cw-page {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            overflow-y: auto; transition: opacity 0.35s ease, transform 0.35s ease;
+            padding: 0; box-sizing: border-box;
+        }
+        .censy-wallet-full .cw-page::-webkit-scrollbar { width: 0; }
+        .censy-wallet-full .cw-page.hidden { opacity: 0; transform: translateX(30px); pointer-events: none; }
+        .censy-wallet-full .cw-page.visible { opacity: 1; transform: translateX(0); pointer-events: auto; }
+        .censy-wallet-full .cw-balance-card {
+            margin: 14px 14px 0; padding: 22px 20px;
+            background: linear-gradient(135deg, #e8f5ee 0%, #dff0ea 40%, #eaf6f0 100%);
+            border-radius: 16px; border: 1px solid rgba(126,200,160,0.2);
+            position: relative; overflow: hidden;
+        }
+        .censy-wallet-full .cw-balance-card::before {
+            content: ''; position: absolute; top: -40px; right: -40px;
+            width: 120px; height: 120px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(126,200,160,0.15), transparent 70%);
+        }
+        .censy-wallet-full .cw-balance-label {
+            font-size: 10px; color: #7a9a84; letter-spacing: 1.5px; margin-bottom: 10px; font-weight: 500;
+        }
+        .censy-wallet-full .cw-balance-row {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-bottom: 18px; padding-bottom: 14px;
+            border-bottom: 1px solid rgba(126,200,160,0.15);
+        }
+        .censy-wallet-full .cw-balance-item { flex: 1; }
+        .censy-wallet-full .cw-balance-item + .cw-balance-item { text-align: right; }
+        .censy-wallet-full .cw-balance-type {
+            font-size: 10px; color: #8aaa94; margin-bottom: 4px; letter-spacing: 0.5px;
+        }
+        .censy-wallet-full .cw-balance-num {
+            font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 500; color: #2d3a2e;
+        }
+        .censy-wallet-full .cw-balance-num-green { color: #3a7d5c; }
+        .censy-wallet-full .cw-balance-num-sm {
+            font-family: 'DM Mono', monospace; font-size: 14px; color: #4a5e4e;
+        }
+        .censy-wallet-full .cw-total-row { display: flex; justify-content: space-between; align-items: center; }
+        .censy-wallet-full .cw-total-label { font-size: 10px; color: #7a9a84; font-weight: 500; }
+        .censy-wallet-full .cw-total-num {
+            font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 700;
+            color: #3a7d5c;
+        }
+        .censy-wallet-full .cw-stock-section { margin: 16px 14px 0; }
+        .censy-wallet-full .cw-stock-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px; padding: 0 2px;
+        }
+        .censy-wallet-full .cw-stock-title {
+            font-size: 13px; font-weight: 700; color: #2d3a2e; letter-spacing: 1px;
+        }
+        .censy-wallet-full .cw-stock-badge {
+            font-size: 9px; color: #7ec8a0; padding: 3px 10px; border-radius: 12px;
+            background: rgba(126,200,160,0.1); letter-spacing: 0.5px; font-weight: 500;
+        }
+        .censy-wallet-full .cw-stock-summary { display: flex; gap: 8px; margin-bottom: 14px; }
+        .censy-wallet-full .cw-summary-box {
+            flex: 1; background: #fff; border-radius: 12px;
+            padding: 12px 8px; border: 1px solid rgba(0,0,0,0.04);
+            text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .censy-wallet-full .cw-summary-label { font-size: 9px; color: #9aaa9e; margin-bottom: 5px; }
+        .censy-wallet-full .cw-summary-val {
+            font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 700;
+        }
+        .censy-wallet-full .cw-val-up { color: #e25c5c; }
+        .censy-wallet-full .cw-val-down { color: #3a7d5c; }
+        .censy-wallet-full .cw-stock-list { display: flex; flex-direction: column; gap: 8px; padding-bottom: 20px; }
+        .censy-wallet-full .cw-stock-row {
+            display: flex; align-items: center; padding: 12px 14px;
+            background: #fff; border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.04); transition: box-shadow 0.2s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+        }
+        .censy-wallet-full .cw-stock-info { flex: 1; }
+        .censy-wallet-full .cw-stock-name { font-size: 13px; color: #2d3a2e; font-weight: 600; }
+        .censy-wallet-full .cw-stock-code { font-size: 9px; color: #aab8ae; margin-top: 2px; font-family: 'DM Mono', monospace; }
+        .censy-wallet-full .cw-stock-price { text-align: right; margin-right: 12px; }
+        .censy-wallet-full .cw-stock-cur { font-family: 'DM Mono', monospace; font-size: 13px; color: #4a5e4e; font-weight: 500; }
+        .censy-wallet-full .cw-stock-vol { font-size: 9px; color: #aab8ae; margin-top: 2px; }
+        .censy-wallet-full .cw-stock-change {
+            min-width: 68px; padding: 5px 10px; border-radius: 8px; text-align: center;
+            font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 700;
+        }
+        .censy-wallet-full .cw-change-up { background: rgba(226,92,92,0.08); color: #e25c5c; }
+        .censy-wallet-full .cw-change-down { background: rgba(58,125,92,0.08); color: #3a7d5c; }
+        .censy-wallet-full .cw-bill-header-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 18px 10px;
+        }
+        .censy-wallet-full .cw-bill-title { font-size: 13px; color: #2d3a2e; font-weight: 700; letter-spacing: 1px; }
+        .censy-wallet-full .cw-bill-month { font-size: 10px; color: #9aaa9e; }
+        .censy-wallet-full .cw-bill-list { display: flex; flex-direction: column; padding: 0 14px 20px; }
+        .censy-wallet-full .cw-bill-item {
+            display: flex; align-items: center; padding: 14px 4px;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        .censy-wallet-full .cw-bill-icon {
+            width: 38px; height: 38px; border-radius: 12px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; font-size: 16px;
+            margin-right: 12px;
+        }
+        .censy-wallet-full .cw-bill-icon-mint { background: rgba(126,200,160,0.12); }
+        .censy-wallet-full .cw-bill-icon-sky { background: rgba(100,180,230,0.12); }
+        .censy-wallet-full .cw-bill-icon-coral { background: rgba(226,120,110,0.12); }
+        .censy-wallet-full .cw-bill-icon-sage { background: rgba(140,180,140,0.12); }
+        .censy-wallet-full .cw-bill-icon-lavender { background: rgba(170,150,200,0.12); }
+        .censy-wallet-full .cw-bill-detail { flex: 1; }
+        .censy-wallet-full .cw-bill-desc { font-size: 12px; color: #2d3a2e; font-weight: 500; }
+        .censy-wallet-full .cw-bill-time { font-size: 9px; color: #aab8ae; margin-top: 3px; }
+        .censy-wallet-full .cw-bill-amount {
+            font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 600; text-align: right;
+        }
+        .censy-wallet-full .cw-amount-out { color: #4a5e4e; }
+        .censy-wallet-full .cw-amount-in { color: #3a7d5c; }
+        .censy-wallet-full .cw-brand {
+            position: absolute; bottom: 8px; left: 0; width: 100%; text-align: center;
+            font-size: 8px; color: rgba(126,200,160,0.35); letter-spacing: 3px; pointer-events: none;
+        }
+
+        /* ========= 音乐播放器独立样式（完整嵌入） ========= */
+        .music-player-full {
+            width: 100%; height: 100%; background: #121212; overflow-y: auto;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, "Segoe UI", Roboto, sans-serif;
+        }
+        .music-card {
+            width: 100%; background: #121212; border-radius: 0; overflow: hidden;
+            box-shadow: none; border: none;
+        }
+        .music-header {
+            padding: 20px 20px 0 20px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .music-title { font-size: 18px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .music-title i { color: #ff4a4a; font-size: 20px; }
+        .music-badge { background: #2c2c34; padding: 4px 10px; border-radius: 40px; font-size: 11px; color: #aaa; }
+        .cover-area { display: flex; justify-content: center; margin: 20px 20px 0; }
+        .cover-art { width: 180px; height: 180px; background: linear-gradient(145deg, #6c5ce7, #a363d9); border-radius: 32px; display: flex; align-items: center; justify-content: center; font-size: 72px; color: white; box-shadow: 0 18px 28px -12px rgba(108, 92, 231, 0.4); }
+        .song-info { text-align: center; margin: 20px 20px 0; }
+        .song-name { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+        .song-artist { font-size: 14px; color: #8a99b0; margin-top: 6px; }
+        .controls { display: flex; justify-content: center; align-items: center; gap: 32px; margin: 20px 20px 16px; }
+        .controls button { background: #2c2c34; border: none; width: 52px; height: 52px; border-radius: 52px; font-size: 22px; cursor: pointer; color: #ddd; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; }
+        .controls button:active { transform: scale(0.94); background: #3a3a44; }
+        #playPauseBtnMusic { background: #ff4a4a; color: white; width: 64px; height: 64px; font-size: 28px; box-shadow: 0 8px 18px -6px rgba(255, 74, 74, 0.4); }
+        .progress-area { padding: 0 20px 20px; }
+        .progress-bar { display: flex; align-items: center; gap: 12px; }
+        .progress-time { font-size: 12px; color: #8a99b0; font-family: monospace; min-width: 38px; }
+        .progress-track { flex: 1; height: 4px; background: #2c2c34; border-radius: 4px; cursor: pointer; position: relative; }
+        .progress-fill { width: 0%; height: 100%; background: #ff4a4a; border-radius: 4px; position: relative; }
+        .playlist-section { margin-top: 12px; border-top: 1px solid #2a2a2a; padding: 16px 20px 20px; }
+        .section-label { font-size: 14px; font-weight: 600; color: #ccc; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        .playlist { max-height: 180px; overflow-y: auto; }
+        .playlist-item { padding: 12px 0; border-bottom: 1px solid #2a2a2a; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-radius: 12px; }
+        .playlist-item.active { background: #2c2c34; padding-left: 8px; padding-right: 8px; }
+        .song-left { display: flex; align-items: center; gap: 12px; }
+        .song-icon { font-size: 18px; color: #ff4a4a; }
+        .song-name-sm { font-weight: 500; color: #fff; font-size: 14px; }
+        .song-artist-sm { font-size: 11px; color: #888; margin-top: 2px; }
+        .playing-now { font-size: 11px; color: #ff4a4a; }
+        .link-parser { margin: 8px 20px 20px; background: #1e1e1e; border-radius: 24px; padding: 12px 16px; }
+        .link-input-group { display: flex; gap: 10px; }
+        .link-input-group input { flex: 1; background: #2c2c34; border: none; padding: 12px 16px; border-radius: 40px; font-size: 13px; color: #fff; outline: none; }
+        .link-input-group input::placeholder { color: #6c7a8e; }
+        .parse-btn { background: #ff4a4a; border: none; border-radius: 40px; padding: 0 20px; color: white; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.2s; }
+        .parse-btn:active { transform: scale(0.96); }
+        #musicCardOutput { margin-top: 12px; }
+        .dynamic-card { background: #2c2c34; border-radius: 20px; padding: 12px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .dynamic-card .card-icon { width: 44px; height: 44px; background: #ff4a4a20; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #ff4a4a; }
+        .dynamic-card .card-info { flex: 1; }
+        .dynamic-card .card-info strong { font-size: 14px; color: #fff; }
+        .dynamic-card .card-info p { font-size: 11px; color: #aaa; margin-top: 2px; }
+        .b-music-btn { width: 40px; height: 40px; border-radius: 40px; background: #ff4a4a; border: none; color: white; font-size: 16px; cursor: pointer; }
+        .inline-audio { display: none; }
+        .hint { text-align: center; font-size: 10px; color: #4a4a55; padding: 0 20px 20px; }
+        hr { border-color: #2a2a2a; margin: 4px 20px 12px; }
+        .playlist::-webkit-scrollbar { width: 4px; }
+        .playlist::-webkit-scrollbar-track { background: #1e1e1e; }
+        .playlist::-webkit-scrollbar-thumb { background: #ff4a4a; border-radius: 4px; }
+
+        /* ========= 微博论坛样式（CENSY FORUM v1.0 完整嵌入） ========= */
+        .censy-forum-full {
+            width: 100%; height: 100%; background: #f2f4f3; overflow-y: auto;
+            font-family: 'Noto Sans SC', sans-serif; display: flex; flex-direction: column;
+        }
+        .censy-forum-full .cf-header {
+            height: 50px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 16px; background: #fff; border-bottom: 1px solid rgba(0,0,0,0.04);
+            flex-shrink: 0;
+        }
+        .censy-forum-full .cf-logo { font-size: 16px; font-weight: 900; color: #2d3a2e; letter-spacing: 1px; }
+        .censy-forum-full .cf-logo-dot { color: #7ec8a0; }
+        .censy-forum-full .cf-header-right { display: flex; gap: 10px; align-items: center; }
+        .censy-forum-full .cf-header-btn {
+            width: 30px; height: 30px; border-radius: 50%; background: #f0f5f2;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; cursor: pointer; border: none; transition: background 0.2s;
+        }
+        .censy-forum-full .cf-channels {
+            display: flex; gap: 6px; padding: 10px 14px; background: #fff;
+            border-bottom: 1px solid rgba(0,0,0,0.03); overflow-x: auto; flex-shrink: 0;
+        }
+        .censy-forum-full .cf-channels::-webkit-scrollbar { display: none; }
+        .censy-forum-full .cf-ch-tag {
+            flex-shrink: 0; padding: 5px 14px; border-radius: 20px; font-size: 11px;
+            font-weight: 500; cursor: pointer; border: none; transition: all 0.25s;
+            background: #f0f5f2; color: #6a8a72;
+        }
+        .censy-forum-full .cf-ch-tag.active { background: #3a7d5c; color: #fff; }
+        .censy-forum-full .cf-feed {
+            flex: 1; overflow-y: auto; padding: 10px 12px; display: flex;
+            flex-direction: column; gap: 10px;
+        }
+        .censy-forum-full .cf-post {
+            background: #fff; border-radius: 14px; padding: 14px 16px;
+            border: 1px solid rgba(0,0,0,0.03);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+        }
+        .censy-forum-full .cf-post-head { display: flex; align-items: center; margin-bottom: 10px; }
+        .censy-forum-full .cf-avatar {
+            width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+            margin-right: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 700; color: #fff;
+        }
+        .censy-forum-full .cf-user-info { flex: 1; }
+        .censy-forum-full .cf-username { font-size: 12px; font-weight: 700; color: #2d3a2e; }
+        .censy-forum-full .cf-user-meta { font-size: 9px; color: #aab8ae; margin-top: 1px; }
+        .censy-forum-full .cf-post-tag {
+            font-size: 8px; padding: 2px 7px; border-radius: 8px; font-weight: 500;
+            flex-shrink: 0;
+        }
+        .censy-forum-full .cf-post-body { font-size: 13px; color: #3a4a3e; line-height: 1.7; margin-bottom: 10px; }
+        .censy-forum-full .cf-post-actions {
+            display: flex; gap: 16px; align-items: center; padding-top: 8px;
+            border-top: 1px solid rgba(0,0,0,0.03);
+        }
+        .censy-forum-full .cf-act-btn {
+            display: flex; align-items: center; gap: 4px; font-size: 10px; color: #9aaa9e;
+            cursor: pointer; border: none; background: none; padding: 4px 0;
+            font-family: inherit; transition: color 0.2s;
+        }
+        .censy-forum-full .cf-act-btn svg { width: 14px; height: 14px; }
+        .censy-forum-full .cf-act-count { font-family: 'DM Mono', monospace; font-size: 10px; }
+        .censy-forum-full .cf-comments { margin-top: 10px; padding-top: 8px; }
+        .censy-forum-full .cf-comment {
+            display: flex; gap: 8px; padding: 8px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.02);
+        }
+        .censy-forum-full .cf-cm-avatar {
+            width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: 700; color: #fff;
+        }
+        .censy-forum-full .cf-cm-body { flex: 1; }
+        .censy-forum-full .cf-cm-name { font-size: 10px; font-weight: 700; color: #4a5e4e; }
+        .censy-forum-full .cf-cm-text { font-size: 11px; color: #6a7a6e; line-height: 1.6; margin-top: 2px; }
+        .censy-forum-full .cf-cm-time { font-size: 8px; color: #bcc8be; margin-top: 3px; }
+        .censy-forum-full .cf-cm-expand {
+            font-size: 10px; color: #7ec8a0; cursor: pointer; padding: 4px 0;
+            border: none; background: none; font-family: inherit; font-weight: 500;
+        }
+        .censy-forum-full .cf-hot-badge {
+            display: inline-flex; align-items: center; gap: 3px;
+            font-size: 9px; color: #e25c5c; font-weight: 700;
+        }
+        .censy-forum-full .cf-hot-badge::before {
+            content: ''; width: 5px; height: 5px; border-radius: 50%;
+            background: #e25c5c; display: inline-block;
+        }
+        .censy-forum-full .cf-bottom-bar {
+            height: 44px; background: #fff; border-top: 1px solid rgba(0,0,0,0.04);
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            flex-shrink: 0; padding: 0 14px;
+        }
+        .censy-forum-full .cf-input-mock {
+            flex: 1; height: 30px; border-radius: 16px; background: #f0f5f2;
+            display: flex; align-items: center; padding: 0 14px;
+            font-size: 11px; color: #aab8ae;
+        }
+        .censy-forum-full .cf-post-btn {
+            width: 30px; height: 30px; border-radius: 50%; background: #3a7d5c;
+            display: flex; align-items: center; justify-content: center;
+            border: none; cursor: pointer;
+        }
+        .censy-forum-full .cf-post-btn svg { width: 14px; height: 14px; color: #fff; }
+        .censy-forum-full .cf-brand {
+            position: absolute; bottom: 50px; right: 14px;
+            font-size: 7px; color: rgba(126,200,160,0.25); letter-spacing: 2px;
+            pointer-events: none; transform: rotate(-90deg); transform-origin: bottom right;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="phone">
+    <div class="dynamic-island"><div class="sensor"></div><div class="camera"></div></div>
+    <div class="app-screen" id="mainScreen">
+        <div class="status-bar"><div class="time">9:41</div><div>?? ?? 97%</div></div>
+        <div class="greeting"><h2>★ 灵感岛</h2><p>轻触灵感 · 即刻响应</p></div>
+        <div class="grid-five">
+            <div class="func-card" data-name="微信" data-app="wechat" id="wechatEntry"><div class="icon-bg"><span>??</span></div><div class="app-name">微信</div></div>
+            <div class="func-card" data-name="淘宝" data-app="taobao" id="taobaoEntry"><div class="icon-bg"><span>??</span></div><div class="app-name">淘宝</div></div>
+            <div class="func-card" data-name="微博" data-app="weibo" id="weiboEntry"><div class="icon-bg"><span>??</span></div><div class="app-name">微博</div></div>
+            <div class="func-card" data-name="音乐" data-app="music" id="musicEntry"><div class="icon-bg"><span>??</span></div><div class="app-name">音乐</div></div>
+            <div class="func-card" data-name="钱包" data-app="wallet" id="walletEntry"><div class="icon-bg"><span>??</span></div><div class="app-name">钱包</div></div>
+        </div>
+        <div style="margin-top: auto; text-align: center; font-size: 10px; color: #8e9eb5; padding: 12px 0 6px;">? 指尖触碰 · 即刻启程</div>
+    </div>
+<!-- 微信嵌入层 -->
+    <div class="embed-layer" id="wechatEmbed"><div class="close-app-btn" id="closeWechatBtn">?</div><div class="censy-wechat-app-v1" id="cwc-app"><div class="cw-header"><div class="cw-back" id="cwc-back">?</div><span id="cwc-title">微信</span></div><div class="cw-view-container"><div class="cw-view active" id="view-list"><div class="cw-chat-item" onclick="cwcOpenChat('林星野')"><div class="cw-avatar" style="background: #ffb6c1;">?</div><div class="cw-chat-info"><div class="cw-chat-name">林星野</div><div class="cw-chat-msg">今晚的星空很美?</div></div></div><div class="cw-chat-item" onclick="cwcOpenChat('苏沐澄')"><div class="cw-avatar" style="background: #87ceeb;">??</div><div class="cw-chat-info"><div class="cw-chat-name">苏沐澄</div><div class="cw-chat-msg">新上的展很有意思，一起吗？</div></div></div><div class="cw-chat-item" onclick="cwcOpenChat('设计工坊')"><div class="cw-avatar" style="background: #a9a9a9;">??</div><div class="cw-chat-info"><div class="cw-chat-name">设计工坊</div><div class="cw-chat-msg">@所有人 今晚8点线上分享会</div></div></div><div class="cw-chat-item" onclick="cwcOpenChat('周书瑶')"><div class="cw-avatar" style="background: #dda0dd;">??</div><div class="cw-chat-info"><div class="cw-chat-name">周书瑶</div><div class="cw-chat-msg">朋友圈点赞了你的动态</div></div></div><div class="cw-chat-item" onclick="cwcOpenChat('每日灵感')"><div class="cw-avatar" style="background: #4682b4;">??</div><div class="cw-chat-info"><div class="cw-chat-name">每日灵感</div><div class="cw-chat-msg">重磅更新: AI 重塑创造力</div></div></div></div><div class="cw-view" id="view-chat"><div class="cw-chat-room" id="cwc-msg-list"><div class="cw-msg-row other"><div class="cw-avatar" style="background: #ffb6c1;">?</div><div class="cw-bubble">你看到我发你的照片了吗？极光预告??</div></div><div class="cw-msg-row other"><div class="cw-avatar" style="background: #ffb6c1;">?</div><div class="cw-bubble cw-transfer" onclick="cwcReceiveTransfer(this)" data-received="0"><div class="cw-transfer-icon">￥</div><div class="cw-transfer-info"><div class="cw-transfer-amount">￥ 520.00</div><div class="cw-transfer-status">点我收款</div></div></div></div><div class="cw-msg-row me"><div class="cw-avatar">我</div><div class="cw-bubble">好美！收下心意啦～</div></div></div><div class="cw-input-area"><input type="text" class="cw-input" id="cwc-input" placeholder="输入消息... $520 发送转账红包"><button class="cw-send-btn" onclick="cwcSendMessage()">发送</button></div></div><div class="cw-view" id="view-moments"><div class="cw-moments"><div class="cw-moments-cover"><div class="cw-moments-name">灵感岛主</div><div class="cw-moments-avatar">?</div></div><div class="cw-moment-item"><div class="cw-moment-left"><div class="cw-avatar" style="background: #ffb6c1;">?</div></div><div class="cw-moment-right"><div class="cw-moment-user">林星野</div><div class="cw-moment-content">在冰岛追到了极光，像是神明落下的画笔???</div><div class="cw-moment-pic">?? 极光之舞</div><div class="cw-moment-actions"><span>30分钟前</span><div class="cw-action-btn" onclick="cwcToggleLike(this)">点赞</div></div><div class="cw-comments-box"><div class="cw-like-row"><i class="cw-heart liked"></i> <span class="like-names">苏沐澄, 周书瑶</span></div><div class="cw-comment-row"><span>苏沐澄：</span> 太梦幻了吧！</div><div class="cw-comment-row"><span>我：</span> 我也想去?</div></div></div></div><div class="cw-moment-item"><div class="cw-moment-left"><div class="cw-avatar" style="background: #87ceeb;">??</div></div><div class="cw-moment-right"><div class="cw-moment-user">苏沐澄</div><div class="cw-moment-content">周末看展 | 流动的色彩让心情变得透亮??</div><div class="cw-moment-pic">??? 艺术瞬间</div><div class="cw-moment-actions"><span>1小时前</span><div class="cw-action-btn" onclick="cwcToggleLike(this)">点赞</div></div><div class="cw-comments-box"><div class="cw-like-row"><i class="cw-heart"></i> <span class="like-names">林星野</span></div><div class="cw-comment-row"><span>林星野：</span> 下次一起！</div></div></div></div></div></div></div><div class="cw-tabbar" id="cwc-tabbar"><div class="cw-tab active" onclick="cwcSwitchTab('list')"><span style="font-size:24px; margin-bottom:2px;">??</span>微信</div><div class="cw-tab" onclick="cwcSwitchTab('moments')"><span style="font-size:24px; margin-bottom:2px;">??</span>发现</div></div><div class="cw-watermark">wechat · 沉浸体验</div></div></div>
+
+    <!-- 淘宝嵌入层 -->
+    <div class="embed-layer" id="taobaoEmbed"><div class="close-app-btn" id="closeTaobaoBtn">?</div><div class="censy-tb-app" id="ctb-app"><div class="ctb-header" id="ctb-header"><div class="ctb-back" id="ctb-back" onclick="censyTbBack()">?</div><span id="ctb-title">淘宝</span><div class="ctb-watermark">design by censy</div></div><div class="ctb-view-container"><div class="ctb-view active" id="view-home"><div class="ctb-search-bar"><div class="ctb-search-inner">?? 寻找宝贝店铺...</div></div><div class="ctb-grid" id="ctb-product-list"></div></div><div class="ctb-view" id="view-cart"><div class="ctb-list-wrap" id="ctb-cart-list"><div class="ctb-empty">购物车空空如也，去逛逛吧~</div></div><div class="ctb-cart-footer" id="ctb-cart-footer" style="display:none;"><div class="ctb-total-box">合计: <span class="ctb-total-price" id="ctb-cart-total">￥0.00</span></div><div class="ctb-checkout-btn" onclick="censyTbGoCheckout()">结算</div></div></div><div class="ctb-view" id="view-orders"><div class="ctb-list-wrap" id="ctb-order-list"><div class="ctb-empty">暂无订单信息</div></div></div><div class="ctb-view" id="view-checkout" style="background:#f2f2f2; padding-bottom: 0;"><div class="ctb-address-card" onclick="censyTbChangeAddress()"><div style="display:flex; align-items:center;"><span class="ctb-addr-tag">默认</span><span style="font-size:12px;color:#666;" id="ctb-addr-prov">浙江省 杭州市 滨江区</span></div><div class="ctb-addr-detail" id="ctb-addr-detail">网商路699号 阿里巴巴中心</div><div class="ctb-addr-user" id="ctb-addr-user">薄荷 138****8888</div><div class="ctb-addr-icon">?</div></div><div class="ctb-list-wrap" id="ctb-checkout-items"></div><div class="ctb-pay-bar"><div style="margin-right:15px; font-size:14px;">共付款: <span class="ctb-total-price" id="ctb-pay-total">￥0.00</span></div><div class="ctb-pay-btn" onclick="censyTbPay()">立即支付</div></div></div></div><div class="ctb-tabbar" id="ctb-tabbar"><div class="ctb-tab active" id="tab-home" onclick="censyTbSwitchTab('home')"><div class="ctb-tab-icon">??</div><span>首页</span></div><div class="ctb-tab" id="tab-cart" onclick="censyTbSwitchTab('cart')"><div class="ctb-tab-icon">??</div><span>购物车</span></div><div class="ctb-tab" id="tab-orders" onclick="censyTbSwitchTab('orders')"><div class="ctb-tab-icon">??</div><span>我的订单</span></div></div><div class="ctb-modal-overlay" id="ctb-modal"><div class="ctb-modal-box"><div class="ctb-modal-title" id="ctb-modal-title">提示</div><div id="ctb-modal-content" style="font-size:14px; color:#666;"></div><div class="ctb-modal-btn-group" id="ctb-modal-btns"></div></div></div></div></div>
+
+    <!-- 钱包嵌入层 -->
+    <div class="embed-layer" id="walletEmbed"><div class="close-app-btn" id="closeWalletBtn">?</div><div class="censy-wallet-full"><div class="cw-header"><div class="cw-header-title">WALLET</div><div class="cw-header-dot"></div></div><div class="cw-tab-bar"><div class="cw-tab-btn active" id="walletTab1" onclick="cwSwitchWallet(0)">资产总览</div><div class="cw-tab-btn" id="walletTab2" onclick="cwSwitchWallet(1)">账单明细</div></div><div class="cw-content"><div class="cw-page visible" id="walletPage1"><div class="cw-balance-card"><div class="cw-balance-label">BALANCE OVERVIEW</div><div class="cw-balance-row"><div class="cw-balance-item"><div class="cw-balance-type">微信零钱</div><div class="cw-balance-num">￥386,720<span style="font-size:13px;color:#8aaa94">.45</span></div></div><div class="cw-balance-item"><div class="cw-balance-type">银行卡 (尾号8866)</div><div class="cw-balance-num-sm">￥99,612,438.00</div></div></div><div class="cw-total-row"><div class="cw-total-label">TOTAL ASSETS</div><div class="cw-total-num">￥99,999,158.45</div></div></div><div class="cw-stock-section"><div class="cw-stock-header"><div class="cw-stock-title">同花顺 · 持仓</div><div class="cw-stock-badge">实时行情</div></div><div class="cw-stock-summary"><div class="cw-summary-box"><div class="cw-summary-label">今日盈亏</div><div class="cw-summary-val cw-val-up">+￥284,530</div></div><div class="cw-summary-box"><div class="cw-summary-label">总浮盈</div><div class="cw-summary-val cw-val-up">+￥12,673,200</div></div><div class="cw-summary-box"><div class="cw-summary-label">持仓市值</div><div class="cw-summary-val" style="color:#3a7d5c;">8,240万</div></div></div><div class="cw-stock-list"><div class="cw-stock-row"><div class="cw-stock-info"><div class="cw-stock-name">陆氏集团</div><div class="cw-stock-code">SH 600188</div></div><div class="cw-stock-price"><div class="cw-stock-cur">￥187.42</div><div class="cw-stock-vol">20万股</div></div><div class="cw-stock-change cw-change-up">+3.87%</div></div><div class="cw-stock-row"><div class="cw-stock-info"><div class="cw-stock-name">贵州茅台</div><div class="cw-stock-code">SH 600519</div></div><div class="cw-stock-price"><div class="cw-stock-cur">￥1,688.00</div><div class="cw-stock-vol">5000股</div></div><div class="cw-stock-change cw-change-up">+1.24%</div></div><div class="cw-stock-row"><div class="cw-stock-info"><div class="cw-stock-name">宁德时代</div><div class="cw-stock-code">SZ 300750</div></div><div class="cw-stock-price"><div class="cw-stock-cur">￥221.30</div><div class="cw-stock-vol">3万股</div></div><div class="cw-stock-change cw-change-down">-0.68%</div></div><div class="cw-stock-row"><div class="cw-stock-info"><div class="cw-stock-name">中芯国际</div><div class="cw-stock-code">SH 688981</div></div><div class="cw-stock-price"><div class="cw-stock-cur">￥78.55</div><div class="cw-stock-vol">8万股</div></div><div class="cw-stock-change cw-change-up">+2.13%</div></div><div class="cw-stock-row"><div class="cw-stock-info"><div class="cw-stock-name">比亚迪</div><div class="cw-stock-code">SZ 002594</div></div><div class="cw-stock-price"><div class="cw-stock-cur">￥312.80</div><div class="cw-stock-vol">1.5万股</div></div><div class="cw-stock-change cw-change-up">+0.95%</div></div></div></div></div><div class="cw-page hidden" id="walletPage2"><div class="cw-bill-header-bar"><div class="cw-bill-title">近期账单</div><div class="cw-bill-month">2025年6月</div></div><div class="cw-bill-list"><div class="cw-bill-item"><div class="cw-bill-icon cw-bill-icon-mint">??</div><div class="cw-bill-detail"><div class="cw-bill-desc">转账 · 陆茴 (小号)</div><div class="cw-bill-time">06-09 20:15</div></div><div class="cw-bill-amount cw-amount-out">-￥52,000.00</div></div><div class="cw-bill-item"><div class="cw-bill-icon cw-bill-icon-coral">???</div><div class="cw-bill-detail"><div class="cw-bill-desc">波士顿龙虾 · 私厨到府</div><div class="cw-bill-time">06-09 19:42</div></div><div class="cw-bill-amount cw-amount-out">-￥8,800.00</div></div><div class="cw-bill-item"><div class="cw-bill-icon cw-bill-icon-sky">??</div><div class="cw-bill-detail"><div class="cw-bill-desc">B组收购案 · 律所尾款</div><div class="cw-bill-time">06-09 14:30</div></div><div class="cw-bill-amount cw-amount-out">-￥2,400,000.00</div></div><div class="cw-bill-item"><div class="cw-bill-icon cw-bill-icon-sage">??</div><div class="cw-bill-detail"><div class="cw-bill-desc">股票分红 · 陆氏集团</div><div class="cw-bill-time">06-08 09:00</div></div><div class="cw-bill-amount cw-amount-in">+￥3,740,000.00</div></div><div class="cw-bill-item"><div class="cw-bill-icon cw-bill-icon-lavender">??</div><div class="cw-bill-detail"><div class="cw-bill-desc">迈巴赫S680 · 年度保养</div><div class="cw-bill-time">06-07 16:20</div></div><div class="cw-bill-amount cw-amount-out">-￥46,000.00</div></div><div class="cw-bill-item"><div class="cw-bill-icon cw-bill-icon-mint">??</div><div class="cw-bill-detail"><div class="cw-bill-desc">Brioni 定制西装 × 3</div><div class="cw-bill-time">06-06 11:00</div></div><div class="cw-bill-amount cw-amount-out">-￥187,500.00</div></div><div class="cw-bill-item"><div class="cw-bill-icon cw-bill-icon-sky">??</div><div class="cw-bill-detail"><div class="cw-bill-desc">半岛酒店 · 行政套房</div><div class="cw-bill-time">06-05 22:10</div></div><div class="cw-bill-amount cw-amount-out">-￥32,000.00</div></div><div class="cw-bill-item"><div class="cw-bill-icon cw-bill-icon-sage">??</div><div class="cw-bill-detail"><div class="cw-bill-desc">理财赎回 · 黑卡专属</div><div class="cw-bill-time">06-04 10:00</div></div><div class="cw-bill-amount cw-amount-in">+￥5,000,000.00</div></div><div class="cw-bill-item"><div class="cw-bill-icon cw-bill-icon-coral">??</div><div class="cw-bill-detail"><div class="cw-bill-desc">卡地亚 · 猎豹系列手链</div><div class="cw-bill-time">06-03 15:30</div></div><div class="cw-bill-amount cw-amount-out">-￥428,000.00</div></div><div class="cw-bill-item"><div class="cw-bill-icon cw-bill-icon-lavender">??</div><div class="cw-bill-detail"><div class="cw-bill-desc">湾流G700 · 燃油补给</div><div class="cw-bill-time">06-02 08:45</div></div><div class="cw-bill-amount cw-amount-out">-￥1,260,000.00</div></div></div></div></div><div class="cw-brand">DESIGN BY CENSY ?</div></div></div>
+
+   <!-- 音乐嵌入层 -->
+    <div class="embed-layer" id="musicEmbed"><div class="close-app-btn" id="closeMusicBtn">?</div><div class="music-player-full"><div class="music-card"><div class="music-header"><div class="music-title"><i class="fas fa-headphones"></i> 音乐时光机</div><div class="music-badge"><i class="fas fa-waveform"></i> 沉浸聆听</div></div><div class="cover-area"><div class="cover-art" id="coverArtMusic"><i class="fas fa-music"></i></div></div><div class="song-info"><div class="song-name" id="currentSongNameMusic">夏日轻风</div><div class="song-artist" id="currentArtistMusic">放松时刻</div></div><div class="controls"><button id="prevBtnMusic"><i class="fas fa-backward-step"></i></button><button id="playPauseBtnMusic"><i class="fas fa-play"></i></button><button id="nextBtnMusic"><i class="fas fa-forward-step"></i></button></div><div class="progress-area"><div class="progress-bar"><span class="progress-time" id="currentTimeMusic">0:00</span><div class="progress-track" id="progressTrackMusic"><div class="progress-fill" id="progressFillMusic"></div></div><span class="progress-time" id="totalTimeMusic">0:00</span></div></div><div class="playlist-section"><div class="section-label"><i class="fas fa-list-ul"></i> 播放列表</div><div class="playlist" id="playlistContainerMusic"></div></div><div class="link-parser"><div class="link-input-group"><input type="text" id="musicLinkInput" placeholder="粘贴音乐链接或随便写点什么..." autocomplete="off"><button id="parseMusicBtn" class="parse-btn"><i class="fas fa-link"></i> 解析</button></div><div id="musicCardOutput"></div></div><hr /><div class="hint"><i class="fas fa-circle-nodes"></i> 内置示例音源 · 支持动态生成临时播放卡片</div></div></div></div>
+
+    <!-- 微博嵌入层（CENSY FORUM v1.0） -->
+    <div class="embed-layer" id="weiboEmbed"><div class="close-app-btn" id="closeWeiboBtn">?</div><div class="censy-forum-full" id="censyForumFull"></div></div>
+
+    <div id="toast" class="toast-msg">? 提示信息</div>
+    <div class="home-indicator"></div>
+</div>
+
+<script>
+    // ================= 微信逻辑 =================
+    function cwcSwitchTab(tab) { const listView = document.getElementById('view-list'); const momentsView = document.getElementById('view-moments'); const chatView = document.getElementById('view-chat'); listView.classList.remove('active'); momentsView.classList.remove('active'); if(chatView) chatView.classList.remove('active'); const backBtn = document.getElementById('cwc-back'); const tabbar = document.getElementById('cwc-tabbar'); const titleSpan = document.getElementById('cwc-title'); if(backBtn) backBtn.style.display = 'none'; if(tabbar) tabbar.style.display = 'flex'; if(tab === 'list') { listView.classList.add('active'); titleSpan.innerText = '微信'; } else { momentsView.classList.add('active'); titleSpan.innerText = '朋友圈'; } }
+    window.cwcOpenChat = function(name) { const listView = document.getElementById('view-list'); const chatView = document.getElementById('view-chat'); listView.classList.remove('active'); chatView.classList.add('active'); const backBtn = document.getElementById('cwc-back'); const tabbar = document.getElementById('cwc-tabbar'); const titleSpan = document.getElementById('cwc-title'); if(backBtn) backBtn.style.display = 'block'; if(tabbar) tabbar.style.display = 'none'; titleSpan.innerText = name; const msgContainer = document.getElementById('cwc-msg-list'); if(msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight; };
+    document.getElementById('cwc-back')?.addEventListener('click', function() { cwcSwitchTab('list'); });
+    window.cwcReceiveTransfer = function(el) { if(el.dataset.received === '1') return; el.dataset.received = '1'; el.style.opacity = '0.7'; const statusSpan = el.querySelector('.cw-transfer-status'); if(statusSpan) statusSpan.innerText = '已收款 ?'; showToast('?? 收款成功 520.00元'); };
+    window.cwcToggleLike = function(btn) { const box = btn.closest('.cw-moment-right')?.querySelector('.cw-comments-box'); if(!box) return; const heart = box.querySelector('.cw-heart'); const namesSpan = box.querySelector('.like-names'); if(!heart || !namesSpan) return; if(heart.classList.contains('liked')) { heart.classList.remove('liked'); let current = namesSpan.innerText; current = current.replace('我, ', '').replace(', 我', '').replace('我', ''); namesSpan.innerText = current || ''; } else { heart.classList.add('liked'); let current = namesSpan.innerText; if(current.includes('我')) return; namesSpan.innerText = current ? `我, ${current}` : '我'; } showToast(heart.classList.contains('liked') ? '?? 已点赞' : '取消点赞'); };
+    function escapeHtmlWechat(str) { return str.replace(/[&<>]/g, function(m) { if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m;}); }
+    function parseMessage(text) { if(text.includes('[图片]')) return `<div class="cw-bubble cw-pic-msg">?? ${text.replace('[图片]', '')}</div>`; if(text.includes('[地址]')) return `<div class="cw-bubble cw-location-msg"><div class="cw-loc-title">?? ${text.replace('[地址]', '')}</div><div class="cw-loc-map">附近地图 · 创意园区</div></div>`; if(text.startsWith('$')) { let amount = text.substring(1).trim(); if(amount === '') amount = '0.00'; return `<div class="cw-bubble cw-transfer" onclick="cwcReceiveTransfer(this)" data-received="0"><div class="cw-transfer-icon">￥</div><div class="cw-transfer-info"><div class="cw-transfer-amount">￥ ${amount}</div><div class="cw-transfer-status">点我收款</div></div></div>`; } return `<div class="cw-bubble">${escapeHtmlWechat(text)}</div>`; }
+    window.cwcSendMessage = function() { const input = document.getElementById('cwc-input'); let text = input.value.trim(); if(!text) return; const listDiv = document.getElementById('cwc-msg-list'); let displayHtml = `<div class="cw-msg-row me"><div class="cw-avatar">我</div>${parseMessage(text)}</div>`; listDiv.insertAdjacentHTML('beforeend', displayHtml); input.value = ''; listDiv.scrollTop = listDiv.scrollHeight; if(!text.startsWith('$')) showToast('消息已发送'); };
+
+    // ================= 淘宝逻辑 =================
+    const ctbState = { products: [{ id: 1, name: "Censy特调 浅焙手冲咖啡豆", price: 128.00, picClass: "pic-coffee" },{ id: 2, name: "赛博纪元 高定丝绒哑光唇膏", price: 299.00, picClass: "pic-lipstick" },{ id: 3, name: "暗夜玫瑰 小众沙龙香水50ml", price: 580.00, picClass: "pic-perfume" },{ id: 4, name: "Y2K废土风 智能旗舰手机", price: 6999.00, picClass: "pic-phone" },{ id: 5, name: "极简百搭 通勤真皮托特包", price: 1299.00, picClass: "pic-bag" },{ id: 6, name: "复古回潮 厚底老爹鞋", price: 459.00, picClass: "pic-shoes" }], cart: [], orders: [], addresses: [{ prov: "浙江省 杭州市 滨江区", detail: "网商路699号", user: "薄荷 138****8888" },{ prov: "上海市 浦东新区", detail: "陆家嘴金融中心", user: "薄荷 139****9999" }], currentAddrIdx: 0, tempItem: null };
+    function ctbInitHome() { let html = ''; ctbState.products.forEach(p => { html += `<div class="ctb-item-card"><div class="ctb-item-pic ${p.picClass}"></div><div class="ctb-item-info"><div class="ctb-item-title">${p.name}</div><div class="ctb-item-bottom"><div class="ctb-item-price">${p.price.toFixed(2)}</div><div class="ctb-add-btn" onclick="censyTbReqAdd(${p.id})">+</div></div></div></div>`; }); document.getElementById('ctb-product-list').innerHTML = html; }
+    function ctbShowModal(title, content, btns) { const modal = document.getElementById('ctb-modal'); document.getElementById('ctb-modal-title').innerText = title; document.getElementById('ctb-modal-content').innerHTML = content; const btnGroup = document.getElementById('ctb-modal-btns'); btnGroup.innerHTML = ''; btns.forEach(b => { const div = document.createElement('div'); div.className = `ctb-modal-btn ${b.type}`; div.innerText = b.text; div.onclick = () => { modal.classList.remove('active'); if(b.action) b.action(); }; btnGroup.appendChild(div); }); modal.classList.add('active'); }
+    window.censyTbReqAdd = function(id) { const item = ctbState.products.find(p => p.id === id); ctbShowModal('确认加入购物车', `要将 [${item.name}] 加入购物车吗？`, [{ text: '取消', type: 'ctb-btn-cancel' },{ text: '确认加入', type: 'ctb-btn-confirm', action: () => { ctbState.cart.push(item); ctbShowModal('添加成功', '商品已成功飞入购物车~', [{ text: '知道了', type: 'ctb-btn-confirm' }]); } }]); };
+    function ctbRenderCart() { const wrap = document.getElementById('ctb-cart-list'); const footer = document.getElementById('ctb-cart-footer'); if(ctbState.cart.length === 0) { wrap.innerHTML = '<div class="ctb-empty">购物车空空如也，去逛逛吧~</div>'; footer.style.display = 'none'; return; } let html = '', total = 0; ctbState.cart.forEach(item => { total += item.price; html += `<div class="ctb-list-card"><div class="ctb-list-pic ${item.picClass}"></div><div class="ctb-list-info"><div class="ctb-list-title">${item.name}</div><div class="ctb-list-price">￥${item.price.toFixed(2)}</div></div></div>`; }); wrap.innerHTML = html; document.getElementById('ctb-cart-total').innerText = `￥${total.toFixed(2)}`; footer.style.display = 'flex'; }
+    window.censyTbSwitchTab = function(tabName) { ['home', 'cart', 'orders', 'checkout'].forEach(v => document.getElementById(`view-${v}`).classList.remove('active')); document.getElementById(`view-${tabName}`).classList.add('active'); const title = document.getElementById('ctb-title'); const back = document.getElementById('ctb-back'); const tabbar = document.getElementById('ctb-tabbar'); if(back) back.style.display = 'none'; if(tabbar) tabbar.style.display = 'flex'; if(tabName === 'home') title.innerText = '淘宝'; if(tabName === 'cart') { title.innerText = '购物车'; ctbRenderCart(); } if(tabName === 'orders') { title.innerText = '我的订单'; ctbRenderOrders(); } };
+    window.censyTbGoCheckout = function() { ['home', 'cart', 'orders'].forEach(v => document.getElementById(`view-${v}`).classList.remove('active')); document.getElementById('view-checkout').classList.add('active'); document.getElementById('ctb-header').innerHTML = `<div class="ctb-back" style="display:block;" onclick="censyTbBack()">?</div><span>确认订单</span>`; document.getElementById('ctb-tabbar').style.display = 'none'; let html = '', total = 0; ctbState.cart.forEach(item => { total += item.price; html += `<div class="ctb-list-card" style="margin: 0 10px 10px;"><div class="ctb-list-pic ${item.picClass}" style="width:60px;height:60px;"></div><div class="ctb-list-info" style="height:60px; justify-content:center;"><div class="ctb-list-title" style="font-size:12px; margin-bottom:5px;">${item.name}</div><div class="ctb-list-price" style="font-size:14px;">￥${item.price.toFixed(2)}</div></div></div>`; }); document.getElementById('ctb-checkout-items').innerHTML = html; document.getElementById('ctb-pay-total').innerText = `￥${total.toFixed(2)}`; };
+    window.censyTbBack = function() { document.getElementById('ctb-header').innerHTML = `<div class="ctb-back" id="ctb-back" onclick="censyTbBack()">?</div><span id="ctb-title">购物车</span>`; censyTbSwitchTab('cart'); };
+    window.censyTbChangeAddress = function() { ctbState.currentAddrIdx = ctbState.currentAddrIdx === 0 ? 1 : 0; const addr = ctbState.addresses[ctbState.currentAddrIdx]; document.getElementById('ctb-addr-prov').innerText = addr.prov; document.getElementById('ctb-addr-detail').innerText = addr.detail; document.getElementById('ctb-addr-user').innerText = addr.user; ctbShowModal('地址已切换', `已为您切换至：<br>${addr.detail}`, [{ text: '好的', type: 'ctb-btn-confirm' }]); };
+    window.censyTbPay = function() { ctbShowModal('安全支付', '正在调起Censy加密支付引擎...', [{ text: '确认支付', type: 'ctb-btn-confirm', action: () => { ctbShowModal('支付成功', '您的订单已生成，商家将光速发货！', [{ text: '查看订单', type: 'ctb-btn-confirm', action: () => { ctbState.orders = ctbState.orders.concat(ctbState.cart); ctbState.cart = []; document.getElementById('ctb-header').innerHTML = `<div class="ctb-back" id="ctb-back" onclick="censyTbBack()" style="display:none;">?</div><span id="ctb-title">我的订单</span>`; censyTbSwitchTab('orders'); } }]); } }]); };
+    function ctbRenderOrders() { const wrap = document.getElementById('ctb-order-list'); if(ctbState.orders.length === 0) { wrap.innerHTML = '<div class="ctb-empty">暂无订单信息</div>'; return; } let html = ''; [...ctbState.orders].reverse().forEach(item => { html += `<div class="ctb-list-card"><div class="ctb-list-pic ${item.picClass}"></div><div class="ctb-list-info"><div class="ctb-list-title">${item.name}</div><div style="display:flex; justify-content:space-between; align-items:center;"><span class="ctb-list-price">￥${item.price.toFixed(2)}</span><span style="font-size:12px; color:#ff5000; border:1px solid #ff5000; padding:2px 6px; border-radius:4px;">卖家已发货</span></div></div></div>`; }); wrap.innerHTML = html; }
+    ctbInitHome();
+// ================= 钱包逻辑 =================
+    function cwSwitchWallet(idx) { const tabs = document.querySelectorAll('.censy-wallet-full .cw-tab-btn'); const pages = [document.getElementById('walletPage1'), document.getElementById('walletPage2')]; tabs.forEach((t,i)=>{ if(i===idx) t.classList.add('active'); else t.classList.remove('active'); }); pages.forEach((p,i)=>{ if(i===idx){ p.classList.remove('hidden'); p.classList.add('visible'); } else { p.classList.add('hidden'); p.classList.remove('visible'); } }); }
+
+    // ================= 音乐播放器完整逻辑 =================
+    const musicPlaylist = [
+        { name: '夏日轻风', artist: '放松时刻', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+        { name: '电子星河', artist: 'Synthwave', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+        { name: '钢琴独奏', artist: '古典 mood', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' }
+    ];
+    let musicIndex = 0, musicPlaying = false;
+    const musicAudio = new Audio();
+    function formatTimeMusic(sec) { if(isNaN(sec)) return '0:00'; const m = Math.floor(sec/60), s = Math.floor(sec%60); return `${m}:${s.toString().padStart(2,'0')}`; }
+    function updateMusicProgress() { if(musicAudio.duration && !isNaN(musicAudio.duration)) { const percent = (musicAudio.currentTime / musicAudio.duration)*100; document.getElementById('progressFillMusic').style.width = `${percent}%`; document.getElementById('currentTimeMusic').innerText = formatTimeMusic(musicAudio.currentTime); document.getElementById('totalTimeMusic').innerText = formatTimeMusic(musicAudio.duration); } else { document.getElementById('totalTimeMusic').innerText = '0:00'; } }
+    function loadMusicSong(idx) { const s = musicPlaylist[idx]; if(!s) return; musicAudio.src = s.url; document.getElementById('currentSongNameMusic').innerText = s.name; document.getElementById('currentArtistMusic').innerText = s.artist; document.getElementById('coverArtMusic').innerHTML = `<i class="fas fa-music"></i>`; document.getElementById('progressFillMusic').style.width = '0%'; document.getElementById('currentTimeMusic').innerText = '0:00'; musicAudio.load(); renderMusicPlaylist(); if(musicPlaying) musicAudio.play().catch(()=>{ musicPlaying=false; updateMusicPlayBtn(); }); }
+    function renderMusicPlaylist() { const container = document.getElementById('playlistContainerMusic'); container.innerHTML = ''; musicPlaylist.forEach((s,idx)=>{ const item = document.createElement('div'); item.className = `playlist-item ${idx===musicIndex ? 'active' : ''}`; item.innerHTML = `<div class="song-left"><div class="song-icon"><i class="fas ${idx===musicIndex ? 'fa-play-circle' : 'fa-music'}"></i></div><div><div class="song-name-sm">${s.name}</div><div class="song-artist-sm">${s.artist}</div></div></div>${idx===musicIndex && musicPlaying ? '<div class="playing-now"><i class="fas fa-volume-up"></i> 播放中</div>' : ''}`; item.addEventListener('click',()=>{ if(musicIndex===idx){ if(musicAudio.paused){ musicAudio.play(); musicPlaying=true; } else { musicAudio.pause(); musicPlaying=false; } updateMusicPlayBtn(); renderMusicPlaylist(); } else { musicIndex=idx; loadMusicSong(musicIndex); musicAudio.play().then(()=>{ musicPlaying=true; updateMusicPlayBtn(); renderMusicPlaylist(); }).catch(()=>{ musicPlaying=false; updateMusicPlayBtn(); renderMusicPlaylist(); }); } }); container.appendChild(item); }); }
+    function updateMusicPlayBtn() { const btn = document.getElementById('playPauseBtnMusic'); if(musicPlaying) btn.innerHTML = '<i class="fas fa-pause"></i>'; else btn.innerHTML = '<i class="fas fa-play"></i>'; }
+    function toggleMusicPlay() { if(musicAudio.paused) { musicAudio.play().catch(()=>{}); musicPlaying=true; } else { musicAudio.pause(); musicPlaying=false; } updateMusicPlayBtn(); renderMusicPlaylist(); }
+    function nextMusicTrack() { musicIndex = (musicIndex+1)%musicPlaylist.length; loadMusicSong(musicIndex); musicAudio.play().then(()=>{ musicPlaying=true; updateMusicPlayBtn(); renderMusicPlaylist(); }).catch(()=>{ musicPlaying=false; updateMusicPlayBtn(); renderMusicPlaylist(); }); }
+    function prevMusicTrack() { musicIndex = (musicIndex-1+musicPlaylist.length)%musicPlaylist.length; loadMusicSong(musicIndex); musicAudio.play().then(()=>{ musicPlaying=true; updateMusicPlayBtn(); renderMusicPlaylist(); }).catch(()=>{ musicPlaying=false; updateMusicPlayBtn(); renderMusicPlaylist(); }); }
+    document.getElementById('playPauseBtnMusic')?.addEventListener('click', toggleMusicPlay);
+    document.getElementById('nextBtnMusic')?.addEventListener('click', nextMusicTrack);
+    document.getElementById('prevBtnMusic')?.addEventListener('click', prevMusicTrack);
+    musicAudio.addEventListener('timeupdate', updateMusicProgress);
+    musicAudio.addEventListener('loadedmetadata', updateMusicProgress);
+    musicAudio.addEventListener('play', () => { musicPlaying=true; updateMusicPlayBtn(); renderMusicPlaylist(); });
+    musicAudio.addEventListener('pause', () => { musicPlaying=false; updateMusicPlayBtn(); renderMusicPlaylist(); });
+    musicAudio.addEventListener('ended', nextMusicTrack);
+    document.getElementById('progressTrackMusic')?.addEventListener('click', (e) => { const rect = e.currentTarget.getBoundingClientRect(); const percent = (e.clientX - rect.left)/rect.width; if(musicAudio.duration) musicAudio.currentTime = percent * musicAudio.duration; });
+    function generateMusicCard(linkText) { const short = (linkText.trim()||"未知旋律").slice(0,30); const uid = 'card_'+Date.now()+'_'+Math.random(); const fallbackUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'; const cardDiv = document.createElement('div'); cardDiv.className = 'dynamic-card'; cardDiv.innerHTML = `<div class="card-icon"><i class="fas fa-cloud-music"></i></div><div class="card-info"><strong>?? ${escapeHtmlWechat(short)}</strong><p>临时播放卡片 · 点击按钮试听</p></div><button class="b-music-btn" id="cardPlay_${uid}"><i class="fas fa-play"></i></button><audio id="cardAudio_${uid}" class="inline-audio" preload="none"><source src="${fallbackUrl}" type="audio/mpeg"></audio>`; const playBtn = cardDiv.querySelector(`#cardPlay_${uid}`); const audioElem = cardDiv.querySelector(`#cardAudio_${uid}`); let cardPlaying=false; playBtn.addEventListener('click',(e)=>{ e.stopPropagation(); if(!audioElem.paused){ audioElem.pause(); playBtn.innerHTML='<i class="fas fa-play"></i>'; cardPlaying=false; } else { audioElem.play().then(()=>{ playBtn.innerHTML='<i class="fas fa-pause"></i>'; cardPlaying=true; }).catch(()=>{ alert("请手动允许音频播放"); }); } }); audioElem.addEventListener('ended',()=>{ playBtn.innerHTML='<i class="fas fa-play"></i>'; cardPlaying=false; }); return cardDiv; }
+    function handleParseLink() { let link = document.getElementById('musicLinkInput').value.trim(); if(link==="") link="?? 即兴旋律 · 心动推荐 ??"; const newCard = generateMusicCard(link); const out = document.getElementById('musicCardOutput'); while(out.children.length>=5) out.removeChild(out.lastChild); out.prepend(newCard); document.getElementById('musicLinkInput').value=''; }
+    document.getElementById('parseMusicBtn')?.addEventListener('click', handleParseLink);
+    document.getElementById('musicLinkInput')?.addEventListener('keypress', (e)=>{ if(e.key==='Enter') handleParseLink(); });
+    loadMusicSong(0); musicPlaying=false; updateMusicPlayBtn(); renderMusicPlaylist();
+    setTimeout(()=>{ const demoOut = document.getElementById('musicCardOutput'); if(demoOut.children.length===0){ const demoCard = generateMusicCard("? 海浪白噪音 · 助眠精选 ?"); demoOut.appendChild(demoCard); } },200);
+
+    // ================= 微博论坛完整逻辑 =================
+    (function(){
+        const FORUM_DATA = {
+            channels: ['推荐','校园','吃瓜','搞钱','深夜','树洞','追星','数码'],
+            colors: ['#7ec8a0','#64b4e6','#e2786e','#c8a0e2','#e2c06e','#6eaee2','#e26e8a','#8ab87e','#b8a06e','#6ec8b8'],
+            users: [
+                {name:'九月微凉',tag:'Lv.6'},{name:'芒果冰沙',tag:'Lv.3'},{name:'深巷旧猫',tag:'Lv.8'},{name:'云端漫步',tag:'Lv.5'},
+                {name:'盐焗小猪',tag:'Lv.4'},{name:'北海有鱼',tag:'Lv.7'},{name:'晚风序曲',tag:'Lv.2'},{name:'橘子气泡',tag:'Lv.5'},
+                {name:'雾里看花',tag:'Lv.9'},{name:'糖醋排骨',tag:'Lv.3'},{name:'冬眠计划',tag:'Lv.6'},{name:'落日飞车',tag:'Lv.4'},
+                {name:'薄荷冰茶',tag:'Lv.7'},{name:'猫系青年',tag:'Lv.5'},{name:'椰风挡不住',tag:'Lv.8'}
+            ],
+            posts: [
+                {ch:'校园',body:'今天在图书馆三楼看到一个男生对着高数课本发呆了整整两节课，眼睛一动不动盯着同一页。下课的时候他站起来，课本掉地上翻到了另一页，他看了一眼说"原来还有下一章"。'},
+                {ch:'吃瓜',body:'听说A班那个永远坐最后一排的转学生，家里是开集团的？他昨天体育课受伤了，来接他的车排场大得离谱，年级主任亲自送到校门口。'},
+                {ch:'深夜',body:'凌晨三点突然醒过来，窗外月亮特别好。有的人白天满不在乎的样子，到了深夜手机打字又全部删掉。有些话只适合在没有人听的时候说出来。'},
+                {ch:'搞钱',body:'室友炒基金赚了八百块请全寝室喝奶茶，第二天又亏了两千。他盯着持仓页面说"我现在理解了什么叫长期主义"。'},
+                {ch:'校园',body:'我们班英语老师今天穿了一双AJ来上课，被坐第一排的男生认出来了，下课后围了半圈人让他看鞋。老师说"同学们对单词要是有这种热情我就不用拖堂了"。'},
+                {ch:'树洞',body:'其实不是不想开口。是每次话到嘴边就觉得说出来也没什么用，对方不会懂，懂了也不会在意。后来就习惯了自己消化。习惯是很可怕的东西。'},
+                {ch:'吃瓜',body:'食堂阿姨今天打菜手抖了一下，多给了我两块红烧肉。我对她笑了一下，她说"小姑娘长得好看多吃点"。这种好事我能吹一个学期。'},
+                {ch:'深夜',body:'想问一个很矫情的问题：你们有没有突然觉得，某个人说的某句很普通的话，过了很久以后才听懂是什么意思？那种后知后觉的心跳真的要命。'},
+                {ch:'搞钱',body:'学姐分享的实习内推居然是真的！刚收到面试通知，是那种名字说出来简历能镀金的公司。紧张到手心出汗，已经在厕所练了三遍自我介绍了。'},
+                {ch:'校园',body:'下了一整天的雨，放学的时候突然停了，操场上积水倒映着晚霞。有几个男生直接冲出去踩水，鞋子全湿了还在笑。青春这个词太空了，但那个画面很具体。'},
+                {ch:'吃瓜',body:'重大发现！！学校超市新来的收银小哥长得很像那个综艺里的嘉宾，我去买了三次水就为了确认。第三次他说"同学你今天喝的水够多了"。'},
+                {ch:'树洞',body:'不知道怎么形容那种感觉。明明坐在很多人中间，热闹得很，但忽然之间就安静下来了。不是周围安静，是自己里面的什么东西安静了。'},
+                {ch:'搞钱',body:'存了半年的钱去看了场演唱会，回来的地铁上耳朵还在嗡嗡响，银行卡余额三位数。但是当副歌响起来全场大合唱的时候，我哭了。值。'},
+                {ch:'深夜',body:'最近在练一个习惯：每天睡前写一句话总结今天。写了一个星期发现有四天写的是"还好"。还好是什么意思呢？大概就是不好也不坏，但说不上来差在哪。'},
+                {ch:'校园',body:'今天实验课搭档手滑打翻了整瓶试剂，老师冲过来的速度比百米冲刺还快。事后他说了一句"你们俩今天的实验报告我要看三遍"，全班都在憋笑。'},
+                {ch:'追星',body:'他今天机场图穿的那件风衣我查了一下，全球限量30件。但重点根本不是衣服，是他推行李箱转弯时偏头看了一眼镜头的那个角度。我保存了。'},
+                {ch:'数码',body:'新出的平板实测续航12个小时。然后我拿它看了12个小时视频来验证这个数据。结论：续航是真的，但我的眼睛不行了。'},
+            ],
+            comments: [
+                ['哈哈哈哈哈笑死我了','同一个世界同一种崩溃','这不就是我吗','前排围观','评论比正文好笑'],
+                ['有被安慰到','说到心坎里了','收藏了反复看','妈呀被戳中了','帮顶'],
+                ['真的假的？？？','细说细说','坐等后续','吃到了吃到了','好家伙'],
+                ['羡慕了','这也太好了吧','我酸了','天选之人','沾沾喜气'],
+                ['深夜emo专用','太真实了','一模一样的感觉','泪目','每个字都懂'],
+                ['笑不活了哈哈哈','班级日常了属于是','什么神仙操作','建议出书','这个要火'],
+                ['同款经历！','我上次也是','有画面了','好生动的描写','你就是我'],
+                ['看完沉默了','不说了都是泪','有些东西不说出来最好','轻拍','希望你好'],
+                ['第一次评论给你了','路过留个爪','日常打卡','追更追更','板凳'],
+                ['太好哭了','我不行了','从头笑到尾','已截图','传遍朋友圈'],
+            ],
+            times: ['刚刚','3分钟前','12分钟前','半小时前','1小时前','2小时前','3小时前','昨天 23:47','昨天 21:30','昨天 18:15'],
+            cmTimes: ['刚刚','1分钟前','5分钟前','8分钟前','15分钟前','22分钟前','半小时前','1小时前'],
+            tagColors: { '校园':['#e8f5ee','#3a7d5c'],'吃瓜':['#fef3e2','#c8862e'],'深夜':['#eae4f5','#7a5ca0'],'搞钱':['#e2f0fe','#3a6d9c'],'树洞':['#f5e8e8','#9c5a5a'],'追星':['#fde8f0','#c25a8a'],'数码':['#e4eef5','#4a6a8c'],'推荐':['#e8f5ee','#3a7d5c'] }
+        };
+        function rnd(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+        function rndInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+        function shuffle(a){ let b=[...a]; for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];} return b; }
+        function genAvatar(name,size){ let c = FORUM_DATA.colors[Math.abs(name.charCodeAt(0)*7+name.charCodeAt(name.length-1)*13)%FORUM_DATA.colors.length]; let letter = name.charAt(0); return {color:c, letter:letter, size:size||34}; }
+        function genComments(count){ let html=''; let pool = shuffle(FORUM_DATA.comments.flat()); let usedUsers = shuffle(FORUM_DATA.users); for(let i=0;i<count;i++){ let u =usedUsers[i%usedUsers.length]; let av = genAvatar(u.name,22); let text = pool[i%pool.length]; let time = FORUM_DATA.cmTimes[Math.min(i,FORUM_DATA.cmTimes.length-1)]; html+=`<div class="cf-comment"><div class="cf-cm-avatar" style="background:${av.color}">${av.letter}</div><div class="cf-cm-body"><div class="cf-cm-name">${u.name}</div><div class="cf-cm-text">${text}</div><div class="cf-cm-time">${time}</div></div></div>`; } return html; }
+        function renderChannels(){ let box=document.querySelector('#censyForumFull .cf-channels'); if(!box) return; let h=''; FORUM_DATA.channels.forEach((ch,i)=>{ h+=`<div class="cf-ch-tag${i===0?' active':''}" onclick="cfFilterCh(this,'${ch}')">${ch}</div>`; }); box.innerHTML=h; }
+        window.cfFilterCh = function(el, ch){ document.querySelectorAll('#censyForumFull .cf-ch-tag').forEach(t=>t.classList.remove('active')); el.classList.add('active'); renderFeed(ch); };
+        window.cfRefreshForum = function(){ let activeTag = document.querySelector('#censyForumFull .cf-ch-tag.active'); let ch = activeTag ? activeTag.textContent : '推荐'; renderFeed(ch); };
+        function renderFeed(filter){ let feed=document.querySelector('#censyForumFull .cf-feed'); if(!feed) return; let posts = shuffle(FORUM_DATA.posts); if(filter && filter!=='推荐'){ posts = posts.filter(p=>p.ch===filter); } posts = posts.slice(0, rndInt(5,7)); let html=''; posts.forEach((post,idx)=>{ let user = rnd(FORUM_DATA.users); let av = genAvatar(user.name); let time = FORUM_DATA.times[Math.min(idx,FORUM_DATA.times.length-1)]; let likes = rndInt(12,2400); let cmCount = rndInt(3,48); let shares = rndInt(0,120); let isHot = likes > 800; let tc = FORUM_DATA.tagColors[post.ch]||FORUM_DATA.tagColors['推荐']; let showCm = rndInt(0,2); let cmHtml = ''; if(showCm > 0){ let visCount = rndInt(1,3); cmHtml = `<div class="cf-comments">${genComments(visCount)}`; if(cmCount > visCount){ cmHtml += `<div class="cf-cm-expand" onclick="this.parentNode.innerHTML=genMoreCm(${Math.min(cmCount,6)})">展开${cmCount}条评论</div>`; } cmHtml += `</div>`; } html+=`<div class="cf-post"><div class="cf-post-head"><div class="cf-avatar" style="background:${av.color}">${av.letter}</div><div class="cf-user-info"><div class="cf-username">${user.name} <span style="font-size:9px;color:#bcc8be;font-weight:400">${user.tag}</span></div><div class="cf-user-meta">${time}${isHot?' · <span class="cf-hot-badge">HOT</span>':''}</div></div><div class="cf-post-tag" style="background:${tc[0]};color:${tc[1]}">${post.ch}</div></div><div class="cf-post-body">${post.body}</div><div class="cf-post-actions"><div class="cf-act-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span class="cf-act-count">${likes}</span></div><div class="cf-act-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="cf-act-count">${cmCount}</span></div><div class="cf-act-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span class="cf-act-count">${shares||''}</span></div></div>${cmHtml}</div>`; }); feed.innerHTML = html; }
+        window.genMoreCm = function(n){ return genComments(n); };
+        const forumContainer = document.getElementById('censyForumFull');
+        forumContainer.innerHTML = `<div class="cf-header"><div class="cf-logo">ECHO<span class="cf-logo-dot">.</span></div><div class="cf-header-right"><div class="cf-header-btn" onclick="cfRefreshForum()">?</div><div class="cf-header-btn">??</div></div></div><div class="cf-channels"></div><div class="cf-feed"></div><div class="cf-bottom-bar"><div class="cf-input-mock">说点什么好呢</div><div class="cf-post-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div></div><div class="cf-brand">DESIGN BY CENSY ?</div>`;
+        renderChannels();
+        renderFeed('推荐');
+    })();
+
+    // ================= 全局通用 =================
+    function showToast(msg) { const toast = document.getElementById('toast'); if(!toast) return; clearTimeout(window.toastTimer); toast.textContent = msg; toast.classList.add('show'); window.toastTimer = setTimeout(() => toast.classList.remove('show'), 1500); }
+    document.getElementById('wechatEntry').addEventListener('click', () => { document.getElementById('wechatEmbed').classList.add('active'); showToast('? 打开微信 · 沉浸式体验'); });
+    document.getElementById('closeWechatBtn').addEventListener('click', () => { document.getElementById('wechatEmbed').classList.remove('active'); showToast('返回主屏幕'); });
+    document.getElementById('taobaoEntry').addEventListener('click', () => { document.getElementById('taobaoEmbed').classList.add('active'); showToast('?? 开启淘宝 · 发现好物'); });
+    document.getElementById('closeTaobaoBtn').addEventListener('click', () => { document.getElementById('taobaoEmbed').classList.remove('active'); showToast('返回主屏幕'); });
+    document.getElementById('walletEntry').addEventListener('click', () => { document.getElementById('walletEmbed').classList.add('active'); showToast('?? 打开灵感钱包 · 资产管理'); });
+    document.getElementById('closeWalletBtn').addEventListener('click', () => { document.getElementById('walletEmbed').classList.remove('active'); showToast('返回主屏幕'); });
+    document.getElementById('musicEntry').addEventListener('click', () => { document.getElementById('musicEmbed').classList.add('active'); showToast('?? 开启音乐时光机 · 沉浸聆听'); });
+    document.getElementById('closeMusicBtn').addEventListener('click', () => { document.getElementById('musicEmbed').classList.remove('active'); showToast('返回主屏幕'); });
+    document.getElementById('weiboEntry').addEventListener('click', () => { document.getElementById('weiboEmbed').classList.add('active'); showToast('?? 开启ECHO社区 · 灵感热帖'); });
+    document.getElementById('closeWeiboBtn').addEventListener('click', () => { document.getElementById('weiboEmbed').classList.remove('active'); showToast('返回主屏幕'); });
+    document.querySelectorAll('.func-card:not(#wechatEntry):not(#taobaoEntry):not(#walletEntry):not(#musicEntry):not(#weiboEntry)').forEach(card => { card.addEventListener('click', () => { const name = card.getAttribute('data-name') || '应用'; showToast(`? 即将开启 ${name} 探索之旅`); }); });
+    function updateTime() { const timeEl = document.querySelector('.time'); if(timeEl) { const now = new Date(); let hours = now.getHours() % 12 || 12; let minutes = now.getMinutes().toString().padStart(2,'0'); timeEl.textContent = `${hours}:${minutes}`; } }
+    setInterval(updateTime, 1000); updateTime();
+</script>
+</body>
+</html>
+
